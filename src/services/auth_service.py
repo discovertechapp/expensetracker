@@ -144,3 +144,23 @@ def login_user(payload):
             "role": user["role"]
         }
     }
+
+
+def approve_user(user_id):
+
+    users_df = read_csv_data("users.csv")
+
+    users_df.loc[
+        users_df["id"] == user_id,
+        "is_approved"
+    ] = True
+
+    write_csv_data(
+        "users.csv",
+        users_df
+    )
+
+    return {
+        "status": True,
+        "message": "User approved successfully"
+    }
