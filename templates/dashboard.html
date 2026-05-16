@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-4">
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <h5>Total Expense</h5>
+
+                <h2 id="totalExpense">
+                    ₹0
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-6">
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <h5>Add Expense</h5>
+
+                <form id="expenseForm">
+
+                    <input
+                        type="text"
+                        class="form-control mb-2"
+                        placeholder="Main Category"
+                        id="main_category"
+                        required
+                    >
+
+                    <input
+                        type="text"
+                        class="form-control mb-2"
+                        placeholder="Sub Category"
+                        id="sub_category"
+                        required
+                    >
+
+                    <input
+                        type="number"
+                        class="form-control mb-2"
+                        placeholder="Amount"
+                        id="amount"
+                        required
+                    >
+
+                    <input
+                        type="date"
+                        class="form-control mb-2"
+                        id="expense_date"
+                        required
+                    >
+
+                    <textarea
+                        class="form-control mb-2"
+                        placeholder="Description"
+                        id="description"
+                    ></textarea>
+
+                    <button
+                        class="btn btn-success w-100"
+                    >
+                        Add Expense
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <canvas id="expenseChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-md-12">
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <h5>Expenses</h5>
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Category</th>
+                            <th>Sub Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="expenseTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token")
+const userId = localStorage.getItem("user_id")
+
+
+async function loadDashboard(){
+
+    const response = await fetch(
+        `/dashboard?user_id=${userId}`,
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    const result = await response.json()
+
+    document.getElementById(
+        "totalExpense"
+    ).innerText =
+        `₹${result.data.total_expense}`
+
+    loadChart(result.data.category_summary)
+}
+
+
+async function loadExpenses(){
+
+    const response = await fetch(
+        `/expenses?user_id=${userId}`,
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    const result = await response.json()
+
+    let html = ""
+
+    result.data.forEach((expense) => {
+
+        html += `
+            <tr>
+                <td>${expense.main_category}</td>
+                <td>${expense.sub_category}</td>
+                <td>₹${expense.amount}</td>
+                <td>${expense.expense_date}</td>
+            </tr>
+        `
+    })
+
+    document.getElementById(
+        "expenseTable"
+    ).innerHTML = html
+}
+
+
+function loadChart(data){
+
+    const labels = data.map(
+        item => item.category
+    )
+
+    const amounts = data.map(
+        item => item.amount
+    )
+
+    new Chart(
+        document.getElementById(
+            "expenseChart"
+        ),
+        {
+            type: "pie",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: amounts
+                }]
+            }
+        }
+    )
+}
+
+
+document
+.getElementById("expenseForm")
+.addEventListener("submit", async (e) => {
+
+    e.preventDefault()
+
+    const response = await fetch(
+        "/expenses",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json",
+
+                Authorization:
+                    `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+
+                user_id: parseInt(userId),
+
+                main_category:
+                    document.getElementById(
+                        "main_category"
+                    ).value,
+
+                sub_category:
+                    document.getElementById(
+                        "sub_category"
+                    ).value,
+
+                amount: parseFloat(
+                    document.getElementById(
+                        "amount"
+                    ).value
+                ),
+
+                expense_date:
+                    document.getElementById(
+                        "expense_date"
+                    ).value,
+
+                description:
+                    document.getElementById(
+                        "description"
+                    ).value
+            })
+        }
+    )
+
+    const result = await response.json()
+
+    alert(result.message)
+
+    loadDashboard()
+
+    loadExpenses()
+})
+
+
+loadDashboard()
+
+loadExpenses()
+
+</script>
+
+{% endblock %}
