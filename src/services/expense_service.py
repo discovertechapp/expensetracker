@@ -1,47 +1,84 @@
-import pandas as pd
-
 from datetime import datetime
 
-from src.utils.csv_handler import (
-    read_csv_data,
-    write_csv_data
-)
+from src.utils.elasticsearch_handler import get_es_client
+
+es = get_es_client()
 
 
-def add_expense(payload):
+# ---------------------------------------------------------
+# Create Expense
+# ---------------------------------------------------------
+def create_expense(payload):
 
-    expenses_df = read_csv_data("expenses.csv")
+    expense_count = es.count(
+        index="expenses"
+    )["count"]
 
-    new_id = 1
-
-    if not expenses_df.empty:
-        new_id = expenses_df["id"].max() + 1
-
-    expense = {
-        "id": new_id,
+    document = {
+        "expense_id": expense_count + 1,
         "user_id": payload["user_id"],
         "main_category": payload["main_category"],
         "sub_category": payload["sub_category"],
         "amount": payload["amount"],
         "description": payload.get("description", ""),
         "expense_date": payload["expense_date"],
-        "created_at": datetime.now()
+        "created_at": str(datetime.now())
     }
 
-    expenses_df = pd.concat(
-        [
-            expenses_df,
-            pd.DataFrame([expense])
-        ],
-        ignore_index=True
-    )
-
-    write_csv_data(
-        "expenses.csv",
-        expenses_df
+    es.index(
+        index="expenses",
+        document=document
     )
 
     return {
         "status": True,
         "message": "Expense added successfully"
+    }
+
+
+# ---------------------------------------------------------
+# Get Expenses
+# ---------------------------------------------------------
+def get_expenses(user_id=None):
+
+    query = {
+        "match_all": {}
+    }
+
+    if user_id:
+
+        query = {
+            "term": {
+                "user_id": user_id
+            }
+        }
+
+    response = es.search(
+        index="expenses",
+        body={
+            "size": 1000,
+            "sort": [
+                {
+                    "expense_date": {
+                        "order": "desc"
+                    }
+                }
+            ],
+            "query": query
+        }
+    )
+
+    expenses = []
+
+    for hit in response["hits"]["hits"]:
+
+        expense = hit["_source"]
+
+        expense["document_id"] = hit["_id"]
+
+        expenses.append(expense)
+
+    return {
+        "status": True,
+        "data": expenses
     }
