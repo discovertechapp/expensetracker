@@ -4,6 +4,7 @@ from src.routes.auth_routes import auth_bp
 from src.routes.expense_routes import expense_bp
 from src.routes.dashboard_routes import dashboard_bp
 from src.routes.diary_routes import diary_bp
+from src.routes.category_routes import category_bp
 
 from src.utils.index_manager import create_indices
 from src.services.auth_service import create_default_admin
@@ -17,6 +18,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(expense_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(diary_bp)
+app.register_blueprint(category_bp)
 
 
 @app.route("/")
