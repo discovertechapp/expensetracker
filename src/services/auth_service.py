@@ -57,3 +57,40 @@ def register_user(payload):
         "status": True,
         "message": "User registered successfully"
     }
+
+
+def create_default_admin():
+
+    users_df = read_csv_data("users.csv")
+
+    if not users_df.empty:
+
+        admin_exists = users_df[
+            users_df["role"] == "admin"
+        ]
+
+        if not admin_exists.empty:
+            return
+
+    admin_user = {
+        "id": 1,
+        "name": "Admin",
+        "email": "admin@gmail.com",
+        "password": "admin123",
+        "role": "admin",
+        "is_approved": True,
+        "created_at": datetime.now()
+    }
+
+    users_df = pd.concat(
+        [
+            users_df,
+            pd.DataFrame([admin_user])
+        ],
+        ignore_index=True
+    )
+
+    write_csv_data(
+        "users.csv",
+        users_df
+    )
