@@ -1,56 +1,89 @@
-import pandas as pd
-
 from datetime import datetime
 
-from src.utils.csv_handler import (
-    read_csv_data,
-    write_csv_data
-)
+from src.utils.elasticsearch_handler import get_es_client
+
+es = get_es_client()
 
 
+# ---------------------------------------------------------
+# Create Default Admin
+# ---------------------------------------------------------
+def create_default_admin():
+
+    response = es.search(
+        index="users",
+        body={
+            "query": {
+                "term": {
+                    "role.keyword": "admin"
+                }
+            }
+        }
+    )
+
+    total = response["hits"]["total"]["value"]
+
+    if total > 0:
+        return
+
+    admin_user = {
+        "user_id": 1,
+        "name": "Admin",
+        "email": "admin@gmail.com",
+        "password": "admin123",
+        "role": "admin",
+        "is_approved": True,
+        "created_at": str(datetime.now())
+    }
+
+    es.index(
+        index="users",
+        document=admin_user
+    )
+
+    print("Default admin created")
+
+
+# ---------------------------------------------------------
+# Register User
+# ---------------------------------------------------------
 def register_user(payload):
 
-    users_df = read_csv_data("users.csv")
-
-    if not users_df.empty:
-
-        existing_user = users_df[
-            users_df["email"] == payload["email"]
-        ]
-
-        if not existing_user.empty:
-
-            return {
-                "status": False,
-                "message": "Email already exists"
+    existing_user = es.search(
+        index="users",
+        body={
+            "query": {
+                "term": {
+                    "email.keyword": payload["email"]
+                }
             }
+        }
+    )
 
-    new_id = 1
+    total = existing_user["hits"]["total"]["value"]
 
-    if not users_df.empty:
-        new_id = users_df["id"].max() + 1
+    if total > 0:
+
+        return {
+            "status": False,
+            "message": "Email already exists"
+        }
+
+    user_count = es.count(index="users")["count"]
 
     new_user = {
-        "id": new_id,
+        "user_id": user_count + 1,
         "name": payload["name"],
         "email": payload["email"],
         "password": payload["password"],
         "role": "user",
         "is_approved": False,
-        "created_at": datetime.now()
+        "created_at": str(datetime.now())
     }
 
-    users_df = pd.concat(
-        [
-            users_df,
-            pd.DataFrame([new_user])
-        ],
-        ignore_index=True
-    )
-
-    write_csv_data(
-        "users.csv",
-        users_df
+    es.index(
+        index="users",
+        document=new_user
     )
 
     return {
@@ -59,66 +92,32 @@ def register_user(payload):
     }
 
 
-def create_default_admin():
-
-    users_df = read_csv_data("users.csv")
-
-    if not users_df.empty:
-
-        admin_exists = users_df[
-            users_df["role"] == "admin"
-        ]
-
-        if not admin_exists.empty:
-            return
-
-    admin_user = {
-        "id": 1,
-        "name": "Admin",
-        "email": "admin@gmail.com",
-        "password": "admin123",
-        "role": "admin",
-        "is_approved": True,
-        "created_at": datetime.now()
-    }
-
-    users_df = pd.concat(
-        [
-            users_df,
-            pd.DataFrame([admin_user])
-        ],
-        ignore_index=True
-    )
-
-    write_csv_data(
-        "users.csv",
-        users_df
-    )
-
-
+# ---------------------------------------------------------
+# Login User
+# ---------------------------------------------------------
 def login_user(payload):
 
-    users_df = read_csv_data("users.csv")
-
-    if users_df.empty:
-
-        return {
-            "status": False,
-            "message": "No users found"
+    response = es.search(
+        index="users",
+        body={
+            "query": {
+                "term": {
+                    "email.keyword": payload["email"]
+                }
+            }
         }
+    )
 
-    user_df = users_df[
-        users_df["email"] == payload["email"]
-    ]
+    total = response["hits"]["total"]["value"]
 
-    if user_df.empty:
+    if total == 0:
 
         return {
             "status": False,
             "message": "Invalid email"
         }
 
-    user = user_df.iloc[0]
+    user = response["hits"]["hits"][0]["_source"]
 
     if user["password"] != payload["password"]:
 
@@ -127,7 +126,7 @@ def login_user(payload):
             "message": "Invalid password"
         }
 
-    if not bool(user["is_approved"]):
+    if not user["is_approved"]:
 
         return {
             "status": False,
@@ -137,27 +136,47 @@ def login_user(payload):
     return {
         "status": True,
         "message": "Login successful",
-        "data": {
-            "user_id": int(user["id"]),
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"]
-        }
+        "data": user
     }
 
 
+# ---------------------------------------------------------
+# Approve User
+# ---------------------------------------------------------
 def approve_user(user_id):
 
-    users_df = read_csv_data("users.csv")
+    response = es.search(
+        index="users",
+        body={
+            "query": {
+                "term": {
+                    "user_id": user_id
+                }
+            }
+        }
+    )
 
-    users_df.loc[
-        users_df["id"] == user_id,
-        "is_approved"
-    ] = True
+    total = response["hits"]["total"]["value"]
 
-    write_csv_data(
-        "users.csv",
-        users_df
+    if total == 0:
+
+        return {
+            "status": False,
+            "message": "User not found"
+        }
+
+    hit = response["hits"]["hits"][0]
+
+    doc_id = hit["_id"]
+
+    user = hit["_source"]
+
+    user["is_approved"] = True
+
+    es.index(
+        index="users",
+        id=doc_id,
+        document=user
     )
 
     return {
