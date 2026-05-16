@@ -4,6 +4,7 @@ from src.routes.auth_routes import auth_bp
 from src.routes.expense_routes import expense_bp
 from src.routes.dashboard_routes import dashboard_bp
 from src.routes.diary_routes import diary_bp
+from src.services.auth_service import create_default_admin
 
 app = Flask(__name__)
 
@@ -24,6 +25,8 @@ def home():
 
 
 if __name__ == "__main__":
+    create_default_admin()
+    
     app.run(
         debug=True,
         host="0.0.0.0",
