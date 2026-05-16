@@ -5,6 +5,7 @@ from src.routes.expense_routes import expense_bp
 from src.routes.dashboard_routes import dashboard_bp
 from src.routes.diary_routes import diary_bp
 from src.routes.category_routes import category_bp
+from src.routes.ui_routes import ui_bp
 
 from src.utils.index_manager import create_indices
 from src.services.auth_service import create_default_admin
@@ -19,15 +20,16 @@ app.register_blueprint(expense_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(diary_bp)
 app.register_blueprint(category_bp)
+app.register_blueprint(ui_bp)
 
 
-@app.route("/")
-def home():
+# @app.route("/")
+# def home():
 
-    return {
-        "status": True,
-        "message": "Expense Tracker Running Successfully"
-    }
+#     return {
+#         "status": True,
+#         "message": "Expense Tracker Running Successfully"
+#     }
 
 
 if __name__ == "__main__":
