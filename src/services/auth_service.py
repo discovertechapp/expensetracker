@@ -1,18 +1,25 @@
 import pandas as pd
+
 from datetime import datetime
 
 from src.utils.csv_handler import (
-    read_csv_file,
-    write_csv_file
+    read_csv_data,
+    write_csv_data
 )
 
 
-def register_user(data):
+def register_user(payload):
 
-    users_df = read_csv_file("users.csv")
+    users_df = read_csv_data("users.csv")
 
     if not users_df.empty:
-        if data["email"] in users_df["email"].values:
+
+        existing_user = users_df[
+            users_df["email"] == payload["email"]
+        ]
+
+        if not existing_user.empty:
+
             return {
                 "status": False,
                 "message": "Email already exists"
@@ -25,22 +32,28 @@ def register_user(data):
 
     new_user = {
         "id": new_id,
-        "name": data["name"],
-        "email": data["email"],
-        "password": data["password"],
+        "name": payload["name"],
+        "email": payload["email"],
+        "password": payload["password"],
         "role": "user",
         "is_approved": False,
         "created_at": datetime.now()
     }
 
     users_df = pd.concat(
-        [users_df, pd.DataFrame([new_user])],
+        [
+            users_df,
+            pd.DataFrame([new_user])
+        ],
         ignore_index=True
     )
 
-    write_csv_file("users.csv", users_df)
+    write_csv_data(
+        "users.csv",
+        users_df
+    )
 
     return {
         "status": True,
-        "message": "User registered successfully. Awaiting admin approval."
+        "message": "User registered successfully"
     }
