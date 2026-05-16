@@ -4,7 +4,7 @@ from src.services.diary_service import (
     create_diary_entry,
     get_diary_entries
 )
-
+from src.utils.auth_middleware import token_required
 diary_bp = Blueprint("diary_bp", __name__)
 
 
@@ -12,6 +12,7 @@ diary_bp = Blueprint("diary_bp", __name__)
 # Create Diary Entry
 # ---------------------------------------------------------
 @diary_bp.route("/diary", methods=["POST"])
+@token_required
 def add_diary():
 
     payload = request.json
@@ -25,6 +26,7 @@ def add_diary():
 # Get Diary Entries
 # ---------------------------------------------------------
 @diary_bp.route("/diary", methods=["GET"])
+@token_required
 def diary():
 
     user_id = request.args.get("user_id")
