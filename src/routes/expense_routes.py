@@ -45,6 +45,7 @@ def expenses():
     "/expenses/<document_id>",
     methods=["PUT"]
 )
+@token_required
 def edit_expense(document_id):
 
     payload = request.json
@@ -64,6 +65,7 @@ def edit_expense(document_id):
     "/expenses/<document_id>",
     methods=["DELETE"]
 )
+@token_required
 def remove_expense(document_id):
 
     response = delete_expense(document_id)
