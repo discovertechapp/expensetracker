@@ -1,15 +1,16 @@
 import pandas as pd
+
 from datetime import datetime
 
 from src.utils.csv_handler import (
-    read_csv_file,
-    write_csv_file
+    read_csv_data,
+    write_csv_data
 )
 
 
-def add_expense(data):
+def add_expense(payload):
 
-    expenses_df = read_csv_file("expenses.csv")
+    expenses_df = read_csv_data("expenses.csv")
 
     new_id = 1
 
@@ -18,21 +19,27 @@ def add_expense(data):
 
     expense = {
         "id": new_id,
-        "user_id": data["user_id"],
-        "main_category_id": data["main_category_id"],
-        "sub_category_id": data["sub_category_id"],
-        "amount": data["amount"],
-        "description": data.get("description", ""),
-        "expense_date": data["expense_date"],
+        "user_id": payload["user_id"],
+        "main_category": payload["main_category"],
+        "sub_category": payload["sub_category"],
+        "amount": payload["amount"],
+        "description": payload.get("description", ""),
+        "expense_date": payload["expense_date"],
         "created_at": datetime.now()
     }
 
     expenses_df = pd.concat(
-        [expenses_df, pd.DataFrame([expense])],
+        [
+            expenses_df,
+            pd.DataFrame([expense])
+        ],
         ignore_index=True
     )
 
-    write_csv_file("expenses.csv", expenses_df)
+    write_csv_data(
+        "expenses.csv",
+        expenses_df
+    )
 
     return {
         "status": True,
