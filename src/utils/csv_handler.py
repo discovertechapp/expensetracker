@@ -1,21 +1,29 @@
 import pandas as pd
 import os
 
-DATA_DIR = "data"
+DATA_FOLDER = "data"
 
 
-def read_csv_file(file_name):
+def get_file_path(file_name):
 
-    path = os.path.join(DATA_DIR, file_name)
+    return os.path.join(DATA_FOLDER, file_name)
 
-    if not os.path.exists(path):
+
+def read_csv_data(file_name):
+
+    file_path = get_file_path(file_name)
+
+    if not os.path.exists(file_path):
         return pd.DataFrame()
 
-    return pd.read_csv(path)
+    return pd.read_csv(file_path)
 
 
-def write_csv_file(file_name, dataframe):
+def write_csv_data(file_name, dataframe):
 
-    path = os.path.join(DATA_DIR, file_name)
+    file_path = get_file_path(file_name)
 
-    dataframe.to_csv(path, index=False)
+    dataframe.to_csv(
+        file_path,
+        index=False
+    )
