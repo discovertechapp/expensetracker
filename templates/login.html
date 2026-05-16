@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-4">
+
+        <div class="card shadow">
+
+            <div class="card-body">
+
+                <h3 class="text-center mb-4">
+                    Login
+                </h3>
+
+                <form id="loginForm">
+
+                    <div class="mb-3">
+
+                        <label>Email</label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label>Password</label>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            required
+                        >
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100"
+                    >
+                        Login
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+document
+.getElementById("loginForm")
+.addEventListener("submit", async (e) => {
+
+    e.preventDefault()
+
+    const response = await fetch(
+        "/login",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email:
+                    document.getElementById(
+                        "email"
+                    ).value,
+
+                password:
+                    document.getElementById(
+                        "password"
+                    ).value
+            })
+        }
+    )
+
+    const result = await response.json()
+
+    if(result.status){
+
+        localStorage.setItem(
+            "token",
+            result.token
+        )
+
+        localStorage.setItem(
+            "user_id",
+            result.data.user_id
+        )
+
+        window.location.href = "/dashboard-ui"
+
+    } else {
+
+        alert(result.message)
+    }
+})
+
+</script>
+
+{% endblock %}
