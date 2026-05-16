@@ -1,17 +1,20 @@
 from flask import Blueprint, request
 
 from src.services.auth_service import register_user
+from src.services.auth_service import login_user
 
 auth_bp = Blueprint("auth_bp", __name__)
 
 
-@auth_bp.route("/login")
+
+@auth_bp.route("/login", methods=["POST"])
 def login():
 
-    return {
-        "status": True,
-        "message": "Login Route Working"
-    }
+    payload = request.json
+
+    response = login_user(payload)
+
+    return response
 
 
 @auth_bp.route("/register", methods=["POST"])
@@ -22,3 +25,6 @@ def register():
     response = register_user(payload)
 
     return response
+
+
+
