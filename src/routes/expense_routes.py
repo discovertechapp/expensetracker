@@ -2,7 +2,9 @@ from flask import Blueprint, request
 
 from src.services.expense_service import (
     create_expense,
-    get_expenses
+    get_expenses,
+    update_expense,
+    delete_expense
 )
 
 expense_bp = Blueprint("expense_bp", __name__)
@@ -30,5 +32,38 @@ def expenses():
     user_id = request.args.get("user_id")
 
     response = get_expenses(user_id)
+
+    return response
+
+
+# ---------------------------------------------------------
+# Update Expense
+# ---------------------------------------------------------
+@expense_bp.route(
+    "/expenses/<document_id>",
+    methods=["PUT"]
+)
+def edit_expense(document_id):
+
+    payload = request.json
+
+    response = update_expense(
+        document_id,
+        payload
+    )
+
+    return response
+
+
+# ---------------------------------------------------------
+# Delete Expense
+# ---------------------------------------------------------
+@expense_bp.route(
+    "/expenses/<document_id>",
+    methods=["DELETE"]
+)
+def remove_expense(document_id):
+
+    response = delete_expense(document_id)
 
     return response
