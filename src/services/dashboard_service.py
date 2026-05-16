@@ -1,27 +1,63 @@
-from src.utils.csv_handler import read_csv_file
+from src.utils.elasticsearch_handler import get_es_client
+
+es = get_es_client()
 
 
+# ---------------------------------------------------------
+# Dashboard Summary
+# ---------------------------------------------------------
 def get_dashboard_summary(user_id):
 
-    expenses_df = read_csv_file("expenses.csv")
-
-    if expenses_df.empty:
-        return {}
-
-    user_expenses = expenses_df[
-        expenses_df["user_id"] == user_id
-    ]
-
-    total_expense = user_expenses["amount"].sum()
-
-    category_summary = (
-        user_expenses
-        .groupby("main_category_id")["amount"]
-        .sum()
-        .to_dict()
+    response = es.search(
+        index="expenses",
+        body={
+            "size": 0,
+            "query": {
+                "term": {
+                    "user_id": user_id
+                }
+            },
+            "aggs": {
+                "total_expense": {
+                    "sum": {
+                        "field": "amount"
+                    }
+                },
+                "category_summary": {
+                    "terms": {
+                        "field": "main_category.keyword"
+                    },
+                    "aggs": {
+                        "total_amount": {
+                            "sum": {
+                                "field": "amount"
+                            }
+                        }
+                    }
+                }
+            }
+        }
     )
 
+    total_expense = response["aggregations"][
+        "total_expense"
+    ]["value"]
+
+    categories = []
+
+    for bucket in response["aggregations"][
+        "category_summary"
+    ]["buckets"]:
+
+        categories.append({
+            "category": bucket["key"],
+            "amount": bucket["total_amount"]["value"]
+        })
+
     return {
-        "total_expense": total_expense,
-        "category_summary": category_summary
+        "status": True,
+        "data": {
+            "total_expense": total_expense,
+            "category_summary": categories
+        }
     }
