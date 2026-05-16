@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from src.utils.elasticsearch_handler import get_es_client
+from src.utils.jwt_handler import generate_token
 
 es = get_es_client()
 
@@ -133,10 +134,18 @@ def login_user(payload):
             "message": "User not approved by admin"
         }
 
+    token = generate_token(user)
+
     return {
         "status": True,
         "message": "Login successful",
-        "data": user
+        "token": token,
+        "data": {
+            "user_id": user["user_id"],
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"]
+        }
     }
 
 
