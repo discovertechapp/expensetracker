@@ -131,3 +131,64 @@ def delete_expense(document_id):
         "status": True,
         "message": "Expense deleted successfully"
     }
+
+
+# ---------------------------------------------------------
+# Search Expenses
+# ---------------------------------------------------------
+def search_expenses(
+    user_id,
+    main_category=None,
+    start_date=None,
+    end_date=None
+):
+
+    must_conditions = [
+        {
+            "term": {
+                "user_id": user_id
+            }
+        }
+    ]
+
+    if main_category:
+
+        must_conditions.append({
+            "term": {
+                "main_category.keyword": main_category
+            }
+        })
+
+    if start_date and end_date:
+
+        must_conditions.append({
+            "range": {
+                "expense_date": {
+                    "gte": start_date,
+                    "lte": end_date
+                }
+            }
+        })
+
+    response = es.search(
+        index="expenses",
+        body={
+            "size": 1000,
+            "query": {
+                "bool": {
+                    "must": must_conditions
+                }
+            }
+        }
+    )
+
+    expenses = []
+
+    for hit in response["hits"]["hits"]:
+
+        expenses.append(hit["_source"])
+
+    return {
+        "status": True,
+        "data": expenses
+    }
