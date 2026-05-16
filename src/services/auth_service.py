@@ -94,3 +94,53 @@ def create_default_admin():
         "users.csv",
         users_df
     )
+
+
+def login_user(payload):
+
+    users_df = read_csv_data("users.csv")
+
+    if users_df.empty:
+
+        return {
+            "status": False,
+            "message": "No users found"
+        }
+
+    user_df = users_df[
+        users_df["email"] == payload["email"]
+    ]
+
+    if user_df.empty:
+
+        return {
+            "status": False,
+            "message": "Invalid email"
+        }
+
+    user = user_df.iloc[0]
+
+    if user["password"] != payload["password"]:
+
+        return {
+            "status": False,
+            "message": "Invalid password"
+        }
+
+    if not bool(user["is_approved"]):
+
+        return {
+            "status": False,
+            "message": "User not approved by admin"
+        }
+
+    return {
+        "status": True,
+        "message": "Login successful",
+        "data": {
+            "user_id": int(user["id"]),
+            "name": user["name"],
+            "email": user["email"],
+            "role": user["role"]
+        }
+    }
