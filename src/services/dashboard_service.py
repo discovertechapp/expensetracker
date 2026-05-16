@@ -61,3 +61,53 @@ def get_dashboard_summary(user_id):
             "category_summary": categories
         }
     }
+
+
+
+# ---------------------------------------------------------
+# Monthly Expense Summary
+# ---------------------------------------------------------
+def get_monthly_summary(user_id):
+
+    response = es.search(
+        index="expenses",
+        body={
+            "size": 0,
+            "query": {
+                "term": {
+                    "user_id": user_id
+                }
+            },
+            "aggs": {
+                "monthly_expenses": {
+                    "date_histogram": {
+                        "field": "expense_date",
+                        "calendar_interval": "month"
+                    },
+                    "aggs": {
+                        "monthly_total": {
+                            "sum": {
+                                "field": "amount"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+    months = []
+
+    for bucket in response["aggregations"][
+        "monthly_expenses"
+    ]["buckets"]:
+
+        months.append({
+            "month": bucket["key_as_string"],
+            "total": bucket["monthly_total"]["value"]
+        })
+
+    return {
+        "status": True,
+        "data": months
+    }
