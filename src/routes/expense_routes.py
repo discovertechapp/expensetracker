@@ -6,7 +6,7 @@ from src.services.expense_service import (
     update_expense,
     delete_expense
 )
-
+from src.utils.auth_middleware import token_required
 expense_bp = Blueprint("expense_bp", __name__)
 
 
@@ -14,6 +14,7 @@ expense_bp = Blueprint("expense_bp", __name__)
 # Create Expense
 # ---------------------------------------------------------
 @expense_bp.route("/expenses", methods=["POST"])
+@token_required
 def add_expense():
 
     payload = request.json
@@ -27,6 +28,7 @@ def add_expense():
 # Get Expenses
 # ---------------------------------------------------------
 @expense_bp.route("/expenses", methods=["GET"])
+@token_required
 def expenses():
 
     user_id = request.args.get("user_id")
