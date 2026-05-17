@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <!-- Sidebar -->
+    <div class="col-md-2 mb-4">
+
+        <div class="glass-card p-4 h-100">
+
+            <h4 class="fw-bold mb-4">
+
+                <i class="bi bi-shield-lock-fill"></i>
+
+                Admin Panel
+
+            </h4>
+
+            <div class="d-grid gap-3">
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-people-fill"></i>
+                    Users
+                </button>
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-graph-up-arrow"></i>
+                    Analytics
+                </button>
+
+                <button
+                    onclick="logout()"
+                    class="btn btn-danger mt-5"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Main -->
+    <div class="col-md-10">
+
+        <!-- Welcome -->
+        <div class="glass-card p-4 mb-4">
+
+            <h2 class="fw-bold">
+
+                Admin Dashboard
+
+            </h2>
+
+            <p class="text-muted-custom">
+
+                Manage users and monitor expenses.
+
+            </p>
+
+        </div>
+
+        <!-- User Table -->
+        <div class="glass-card p-4">
+
+            <h4 class="mb-4">
+
+                User Management
+
+            </h4>
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-dark table-hover"
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Approved</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="userTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const token =
+    localStorage.getItem("token")
+
+
+function logout(){
+
+    localStorage.clear()
+
+    window.location.href = "/"
+}
+
+
+async function loadUsers(){
+
+    const response = await fetch(
+        "/users",
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    const result = await response.json()
+
+    let html = ""
+
+    result.data.forEach((user) => {
+
+        if(user.role === "admin"){
+
+            return
+        }
+
+        html += `
+
+            <tr>
+
+                <td>${user.name}</td>
+
+                <td>${user.email}</td>
+
+                <td>${user.role}</td>
+
+                <td>
+
+                    ${
+                        user.is_approved
+                        ? "Approved"
+                        : "Pending"
+                    }
+
+                </td>
+
+                <td>
+
+                    <button
+                        onclick="approveUser(
+                            '${user.document_id}'
+                        )"
+                        class="btn btn-success btn-sm"
+                    >
+                        Approve
+                    </button>
+
+                    <button
+                        onclick="deleteUser(
+                            '${user.document_id}'
+                        )"
+                        class="btn btn-danger btn-sm"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+        `
+    })
+
+    document.getElementById(
+        "userTable"
+    ).innerHTML = html
+}
+
+
+async function approveUser(documentId){
+
+    await fetch(
+        `/users/${documentId}/approve`,
+        {
+            method: "PUT",
+
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    loadUsers()
+}
+
+
+async function deleteUser(documentId){
+
+    await fetch(
+        `/users/${documentId}`,
+        {
+            method: "DELETE",
+
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    loadUsers()
+}
+
+
+loadUsers()
+
+</script>
+
+{% endblock %}
