@@ -2,54 +2,160 @@
 
 {% block content %}
 
-<div class="row justify-content-center">
+<div class="row align-items-center">
 
-    <div class="col-md-4">
+    <!-- Left Side -->
+    <div class="col-md-6 d-none d-md-block">
 
-        <div class="card shadow">
+        <h1 class="app-title mb-4">
 
-            <div class="card-body">
+            Track Every Rupee.
+            <br>
+            Build Better Habits.
 
-                <h3 class="text-center mb-4">
-                    Login
-                </h3>
+        </h1>
 
-                <form id="loginForm">
+        <p class="fs-5 text-muted-custom">
 
-                    <div class="mb-3">
+            Smart personal finance management with
+            analytics, diary notes, charts and
+            budgeting insights.
 
-                        <label>Email</label>
+        </p>
 
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="email"
-                            required
-                        >
+        <div class="mt-5">
 
-                    </div>
+            <div class="mb-3">
 
-                    <div class="mb-3">
+                <i class="bi bi-bar-chart-fill"></i>
 
-                        <label>Password</label>
+                Dashboard Analytics
 
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            required
-                        >
+            </div>
 
-                    </div>
+            <div class="mb-3">
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary w-100"
+                <i class="bi bi-journal-text"></i>
+
+                Daily Expense Diary
+
+            </div>
+
+            <div class="mb-3">
+
+                <i class="bi bi-pie-chart-fill"></i>
+
+                Category Reports
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Right Side -->
+    <div class="col-md-6">
+
+        <div class="glass-card p-5">
+
+            <div class="text-center mb-4">
+
+                <h2 class="fw-bold">
+
+                    Welcome Back
+
+                </h2>
+
+                <p class="text-muted-custom">
+
+                    Login to continue
+
+                </p>
+
+            </div>
+
+            <form id="loginForm">
+
+                <div class="mb-3">
+
+                    <label class="mb-2">
+
+                        Email Address
+
+                    </label>
+
+                    <input
+                        type="email"
+                        class="form-control form-control-lg"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
                     >
-                        Login
-                    </button>
 
-                </form>
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="mb-2">
+
+                        Password
+
+                    </label>
+
+                    <input
+                        type="password"
+                        class="form-control form-control-lg"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-info btn-lg w-100"
+                >
+
+                    <i class="bi bi-box-arrow-in-right"></i>
+
+                    Login
+
+                </button>
+
+            </form>
+
+            <div class="text-center mt-4">
+
+                <span class="text-muted-custom">
+
+                    New user?
+
+                </span>
+
+                <a
+                    href="/signup"
+                    class="text-info text-decoration-none fw-bold"
+                >
+
+                    Create Account
+
+                </a>
+
+            </div>
+
+            <hr class="my-4 text-light">
+
+            <div class="text-center">
+
+                <small class="text-muted-custom">
+
+                    Default Admin Login
+                    <br>
+
+                    admin@gmail.com / admin123
+
+                </small>
 
             </div>
 
@@ -71,10 +177,13 @@ document
         "/login",
         {
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
+
                 email:
                     document.getElementById(
                         "email"
@@ -100,6 +209,11 @@ document
         localStorage.setItem(
             "user_id",
             result.data.user_id
+        )
+
+        localStorage.setItem(
+            "user_name",
+            result.data.name
         )
 
         window.location.href = "/dashboard-ui"
