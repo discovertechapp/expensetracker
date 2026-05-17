@@ -192,3 +192,41 @@ def approve_user(user_id):
         "status": True,
         "message": "User approved successfully"
     }
+
+
+
+
+def get_all_users_service():
+
+    try:
+
+        response = es.search(
+            index="users",
+            body={
+                "query": {
+                    "match_all": {}
+                },
+                "size": 1000
+            }
+        )
+
+        users = []
+
+        for hit in response["hits"]["hits"]:
+
+            user = hit["_source"]
+            user["document_id"] = hit["_id"]
+
+            users.append(user)
+
+        return {
+            "status": True,
+            "data": users
+        }
+
+    except Exception as e:
+
+        return {
+            "status": False,
+            "message": str(e)
+        }
