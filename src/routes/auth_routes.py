@@ -1,9 +1,11 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from src.services.auth_service import (
     register_user,
     login_user,
-    approve_user
+    get_all_users_service,
+    approve_user_service,
+    delete_user_service
 )
 
 auth_bp = Blueprint("auth_bp", __name__)
@@ -19,7 +21,7 @@ def register():
 
     response = register_user(payload)
 
-    return response
+    return jsonify(response)
 
 
 # ---------------------------------------------------------
@@ -32,15 +34,37 @@ def login():
 
     response = login_user(payload)
 
-    return response
+    return jsonify(response)
 
 
 # ---------------------------------------------------------
-# Approve User
+# Get all users (ADMIN)
 # ---------------------------------------------------------
-@auth_bp.route("/approve-user/<int:user_id>", methods=["PUT"])
-def approve(user_id):
+@auth_bp.route("/users", methods=["GET"])
+def get_users():
 
-    response = approve_user(user_id)
+    response = get_all_users_service()
 
-    return response
+    return jsonify(response)
+
+
+# ---------------------------------------------------------
+# Approve user (ADMIN)
+# ---------------------------------------------------------
+@auth_bp.route("/users/<document_id>/approve", methods=["PUT"])
+def approve_user(document_id):
+
+    response = approve_user_service(document_id)
+
+    return jsonify(response)
+
+
+# ---------------------------------------------------------
+# Delete user (ADMIN)
+# ---------------------------------------------------------
+@auth_bp.route("/users/<document_id>", methods=["DELETE"])
+def delete_user(document_id):
+
+    response = delete_user_service(document_id)
+
+    return jsonify(response)
