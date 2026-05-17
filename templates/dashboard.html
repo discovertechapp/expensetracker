@@ -4,17 +4,56 @@
 
 <div class="row">
 
-    <div class="col-md-4">
+    <!-- Sidebar -->
+    <div class="col-md-2 mb-4">
 
-        <div class="card shadow">
+        <div class="glass-card p-4 h-100">
 
-            <div class="card-body">
+            <h4 class="fw-bold mb-4">
 
-                <h5>Total Expense</h5>
+                <i class="bi bi-wallet2"></i>
 
-                <h2 id="totalExpense">
-                    ₹0
-                </h2>
+                Expense Tracker
+
+            </h4>
+
+            <div class="d-grid gap-3">
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </button>
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-cash-stack"></i>
+                    Expenses
+                </button>
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-journal-text"></i>
+                    Diary
+                </button>
+
+                <button
+                    class="btn btn-outline-light text-start"
+                >
+                    <i class="bi bi-pie-chart-fill"></i>
+                    Reports
+                </button>
+
+                <button
+                    onclick="logout()"
+                    class="btn btn-danger mt-5"
+                >
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </button>
 
             </div>
 
@@ -22,115 +61,272 @@
 
     </div>
 
-</div>
+    <!-- Main Content -->
+    <div class="col-md-10">
 
-<div class="row mt-4">
+        <!-- Welcome -->
+        <div class="glass-card p-4 mb-4">
 
-    <div class="col-md-6">
+            <h2 class="fw-bold">
 
-        <div class="card shadow">
+                Welcome Back,
+                <span id="userName"></span>
 
-            <div class="card-body">
+            </h2>
 
-                <h5>Add Expense</h5>
+            <p class="text-muted-custom mb-0">
 
-                <form id="expenseForm">
+                Here's your expense overview.
 
-                    <input
-                        type="text"
-                        class="form-control mb-2"
-                        placeholder="Main Category"
-                        id="main_category"
-                        required
-                    >
+            </p>
 
-                    <input
-                        type="text"
-                        class="form-control mb-2"
-                        placeholder="Sub Category"
-                        id="sub_category"
-                        required
-                    >
+        </div>
 
-                    <input
-                        type="number"
-                        class="form-control mb-2"
-                        placeholder="Amount"
-                        id="amount"
-                        required
-                    >
+        <!-- Analytics -->
+        <div class="row">
 
-                    <input
-                        type="date"
-                        class="form-control mb-2"
-                        id="expense_date"
-                        required
-                    >
+            <div class="col-md-4 mb-4">
 
-                    <textarea
-                        class="form-control mb-2"
-                        placeholder="Description"
-                        id="description"
-                    ></textarea>
+                <div class="glass-card p-4">
 
-                    <button
-                        class="btn btn-success w-100"
-                    >
+                    <h6>Total Expenses</h6>
+
+                    <h2 id="totalExpense">
+
+                        ₹0
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4 mb-4">
+
+                <div class="glass-card p-4">
+
+                    <h6>This Month</h6>
+
+                    <h2 id="monthlyExpense">
+
+                        ₹0
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4 mb-4">
+
+                <div class="glass-card p-4">
+
+                    <h6>Total Categories</h6>
+
+                    <h2 id="totalCategories">
+
+                        0
+
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Add Expense + Pie Chart -->
+        <div class="row">
+
+            <div class="col-md-5 mb-4">
+
+                <div class="glass-card p-4">
+
+                    <h4 class="mb-4">
+
                         Add Expense
-                    </button>
 
-                </form>
+                    </h4>
+
+                    <form id="expenseForm">
+
+                        <input
+                            type="text"
+                            class="form-control mb-3"
+                            placeholder="Main Category"
+                            id="main_category"
+                            required
+                        >
+
+                        <input
+                            type="text"
+                            class="form-control mb-3"
+                            placeholder="Sub Category"
+                            id="sub_category"
+                            required
+                        >
+
+                        <input
+                            type="number"
+                            class="form-control mb-3"
+                            placeholder="Amount"
+                            id="amount"
+                            required
+                        >
+
+                        <input
+                            type="date"
+                            class="form-control mb-3"
+                            id="expense_date"
+                            required
+                        >
+
+                        <textarea
+                            class="form-control mb-3"
+                            placeholder="Description"
+                            id="description"
+                        ></textarea>
+
+                        <button
+                            class="btn btn-info w-100"
+                        >
+
+                            Add Expense
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-7 mb-4">
+
+                <div class="glass-card p-4">
+
+                    <h4 class="mb-4">
+
+                        Expense Categories
+
+                    </h4>
+
+                    <canvas id="expenseChart"></canvas>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- Monthly Chart -->
+        <div class="row">
 
-    <div class="col-md-6">
+            <div class="col-md-12 mb-4">
 
-        <div class="card shadow">
+                <div class="glass-card p-4">
 
-            <div class="card-body">
+                    <h4 class="mb-4">
 
-                <canvas id="expenseChart"></canvas>
+                        Monthly Expenses
+
+                    </h4>
+
+                    <canvas id="monthlyChart"></canvas>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- Expense Table -->
+        <div class="row">
 
-</div>
+            <div class="col-md-12 mb-4">
 
-<div class="row mt-4">
+                <div class="glass-card p-4">
 
-    <div class="col-md-12">
+                    <h4 class="mb-4">
 
-        <div class="card shadow">
+                        Recent Expenses
 
-            <div class="card-body">
+                    </h4>
 
-                <h5>Expenses</h5>
+                    <div class="table-responsive">
 
-                <table class="table">
+                        <table class="table table-dark table-hover">
 
-                    <thead>
+                            <thead>
 
-                        <tr>
-                            <th>Category</th>
-                            <th>Sub Category</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                        </tr>
+                                <tr>
 
-                    </thead>
+                                    <th>Main</th>
+                                    <th>Sub</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Description</th>
 
-                    <tbody id="expenseTable">
+                                </tr>
 
-                    </tbody>
+                            </thead>
 
-                </table>
+                            <tbody id="expenseTable">
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Diary Section -->
+        <div class="row">
+
+            <div class="col-md-12">
+
+                <div class="glass-card p-4">
+
+                    <h4 class="mb-4">
+
+                        Daily Diary
+
+                    </h4>
+
+                    <form id="diaryForm">
+
+                        <input
+                            type="text"
+                            class="form-control mb-3"
+                            placeholder="Title"
+                            id="diary_title"
+                            required
+                        >
+
+                        <textarea
+                            class="form-control mb-3"
+                            placeholder="Write your notes..."
+                            id="diary_notes"
+                            rows="5"
+                            required
+                        ></textarea>
+
+                        <button
+                            class="btn btn-success"
+                        >
+
+                            Save Diary Entry
+
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -142,8 +338,27 @@
 
 <script>
 
-const token = localStorage.getItem("token")
-const userId = localStorage.getItem("user_id")
+const token =
+    localStorage.getItem("token")
+
+const userId =
+    localStorage.getItem("user_id")
+
+const userName =
+    localStorage.getItem("user_name")
+
+
+document.getElementById(
+    "userName"
+).innerText = userName
+
+
+function logout(){
+
+    localStorage.clear()
+
+    window.location.href = "/"
+}
 
 
 async function loadDashboard(){
@@ -165,7 +380,69 @@ async function loadDashboard(){
     ).innerText =
         `₹${result.data.total_expense}`
 
-    loadChart(result.data.category_summary)
+    document.getElementById(
+        "totalCategories"
+    ).innerText =
+        result.data.category_summary.length
+
+    loadPieChart(
+        result.data.category_summary
+    )
+}
+
+
+async function loadMonthlySummary(){
+
+    const response = await fetch(
+        `/dashboard/monthly-summary?user_id=${userId}`,
+        {
+            headers: {
+                Authorization:
+                    `Bearer ${token}`
+            }
+        }
+    )
+
+    const result = await response.json()
+
+    const labels = result.data.map(
+        item => item.month
+    )
+
+    const totals = result.data.map(
+        item => item.total
+    )
+
+    if(totals.length > 0){
+
+        document.getElementById(
+            "monthlyExpense"
+        ).innerText =
+            `₹${totals[totals.length - 1]}`
+    }
+
+    new Chart(
+
+        document.getElementById(
+            "monthlyChart"
+        ),
+
+        {
+            type: "bar",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [{
+
+                    label: "Monthly Expense",
+
+                    data: totals
+                }]
+            }
+        }
+    )
 }
 
 
@@ -188,11 +465,19 @@ async function loadExpenses(){
     result.data.forEach((expense) => {
 
         html += `
+
             <tr>
+
                 <td>${expense.main_category}</td>
+
                 <td>${expense.sub_category}</td>
+
                 <td>₹${expense.amount}</td>
+
                 <td>${expense.expense_date}</td>
+
+                <td>${expense.description}</td>
+
             </tr>
         `
     })
@@ -203,7 +488,7 @@ async function loadExpenses(){
 }
 
 
-function loadChart(data){
+function loadPieChart(data){
 
     const labels = data.map(
         item => item.category
@@ -214,14 +499,20 @@ function loadChart(data){
     )
 
     new Chart(
+
         document.getElementById(
             "expenseChart"
         ),
+
         {
             type: "pie",
+
             data: {
+
                 labels: labels,
+
                 datasets: [{
+
                     data: amounts
                 }]
             }
@@ -242,6 +533,7 @@ document
             method: "POST",
 
             headers: {
+
                 "Content-Type":
                     "application/json",
 
@@ -289,12 +581,64 @@ document
     loadDashboard()
 
     loadExpenses()
+
+    loadMonthlySummary()
+})
+
+
+document
+.getElementById("diaryForm")
+.addEventListener("submit", async (e) => {
+
+    e.preventDefault()
+
+    const response = await fetch(
+        "/diary",
+        {
+            method: "POST",
+
+            headers: {
+
+                "Content-Type":
+                    "application/json",
+
+                Authorization:
+                    `Bearer ${token}`
+            },
+
+            body: JSON.stringify({
+
+                user_id: parseInt(userId),
+
+                title:
+                    document.getElementById(
+                        "diary_title"
+                    ).value,
+
+                notes:
+                    document.getElementById(
+                        "diary_notes"
+                    ).value,
+
+                entry_date:
+                    new Date()
+                    .toISOString()
+                    .split("T")[0]
+            })
+        }
+    )
+
+    const result = await response.json()
+
+    alert(result.message)
 })
 
 
 loadDashboard()
 
 loadExpenses()
+
+loadMonthlySummary()
 
 </script>
 
