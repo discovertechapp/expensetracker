@@ -37,3 +37,14 @@ def dashboard_page():
     return render_template(
         "dashboard.html"
     )
+
+
+# ---------------------------------------------------------
+# Admin Page
+# ---------------------------------------------------------
+@ui_bp.route("/admin-ui")
+def admin_page():
+
+    return render_template(
+        "admin_dashboard.html"
+    )
